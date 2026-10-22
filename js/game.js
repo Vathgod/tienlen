@@ -18,6 +18,13 @@ const RANK_PLURALS = ['3s', '4s', '5s', '6s', '7s', '8s', '9s', '10s', 'Jacks', 
 
 export const RANK_2 = 12;
 export const THREE_SPADES = 0;
+
+// House rule: for A, 3, 4 and 5 all four suits are equal, and a card of the
+// same rank may be played on top (4♥ on 4♣ and 4♣ on 4♥ are both fine).
+// Every other rank keeps the normal suit order ♠ < ♣ < ♦ < ♥.
+export const SUITLESS_RANKS = Object.freeze([0, 1, 2, 11]); // 3, 4, 5, A
+export const isSuitless = (card) => SUITLESS_RANKS.includes(rankOf(card));
+
 export const PLACE_NAMES = ['1st (Nhất)', '2nd (Nhì)', '3rd (Ba)', '4th (Bét)'];
 
 export const COMBO = Object.freeze({
@@ -139,7 +146,11 @@ export function beats(a, b) {
   if (!a) return false;
   if (!b) return true;
   // Normal rule: same type, same number of cards, higher top card.
-  if (a.type === b.type && a.size === b.size) return a.top > b.top;
+  // Tops of the same suitless rank (A, 3, 4, 5) count as equal, and equal may beat.
+  if (a.type === b.type && a.size === b.size) {
+    if (rankOf(a.top) === rankOf(b.top) && isSuitless(a.top)) return true;
+    return a.top > b.top;
+  }
 
   // Chopping (chặt).
   const aPairs = pairsOf(a);
@@ -159,7 +170,7 @@ export function describeCombo(combo, withTop = false) {
   if (!combo) return '';
   const top = rankOf(combo.top);
   const low = RANKS[rankOf(combo.cards[0])];
-  const high = withTop ? ` (${cardLabel(combo.top)} high)` : '';
+  const high = withTop && !isSuitless(combo.top) ? ` (${cardLabel(combo.top)} high)` : '';
   switch (combo.type) {
     case COMBO.SINGLE: return `single ${cardLabel(combo.top)}`;
     case COMBO.PAIR: return `pair of ${RANK_PLURALS[top]}${high}`;
@@ -309,7 +320,7 @@ export function validatePlay(state, seat, cards) {
   if (!combo) return fail('Not a valid combination');
   if (state.requireThreeSpades && !cards.includes(THREE_SPADES)) return fail('First play must include 3♠');
   if (cur && !beats(combo, cur)) {
-    return fail(`Must beat ${describeCombo(cur, true)}`);
+    return fail(`Must ${isSuitless(cur.top) ? 'match or beat' : 'beat'} ${describeCombo(cur, true)}`);
   }
   return { ok: true, combo, chop: isChop(combo, cur), outOfTurn: false };
 }

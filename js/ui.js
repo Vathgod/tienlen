@@ -8,7 +8,7 @@
  */
 import {
   RANKS, SUITS, PLACE_NAMES, rankOf, suitOf, isRedCard, sortByRank, sortBySuit,
-  validatePlay, passError, describeCombo,
+  validatePlay, passError, describeCombo, isSuitless,
 } from './game.js';
 
 const $ = (sel) => document.querySelector(sel);
@@ -344,7 +344,7 @@ function refreshControls() {
     kind = 'ok';
   } else if (g.turn === me) {
     hint = g.current
-      ? `Your turn — beat the ${describeCombo(g.current.combo, true)} or pass`
+      ? `Your turn — ${isSuitless(g.current.combo.top) ? 'match or beat' : 'beat'} the ${describeCombo(g.current.combo, true)}, or pass`
       : g.requireThreeSpades ? 'Your turn — lead with a combination that includes 3♠' : 'Your turn — lead any combination';
     kind = 'turn';
   } else if (g.passed[me] && g.current) {

@@ -83,12 +83,38 @@ test('Combos', 'top card is the highest by rank then suit', () => {
 
 /* ── Normal comparison ── */
 
-test('Compare', 'singles: rank first, then suit', () => {
+test('Compare', 'singles: rank first, then suit (6 to K and 2)', () => {
   ok(beat('6♠', '5♥'), '6♠ > 5♥');
-  ok(beat('5♥', '5♦'), '5♥ > 5♦');
-  no(beat('5♦', '5♥'), '5♦ < 5♥');
+  ok(beat('7♥', '7♦'), '7♥ > 7♦');
+  no(beat('7♦', '7♥'), '7♦ < 7♥');
+  no(beat('K♠', 'K♣'), 'K♠ < K♣');
   ok(beat('2♠', 'A♥'), '2 is the highest rank');
   ok(beat('2♥', '2♦'));
+  no(beat('2♦', '2♥'), '2s keep the suit order');
+});
+test('Compare', 'A, 3, 4, 5: all suits equal and equal may beat', () => {
+  for (const r of ['A', '3', '4', '5']) {
+    ok(beat(`${r}♣`, `${r}♥`), `${r}♣ on ${r}♥`);
+    ok(beat(`${r}♥`, `${r}♣`), `${r}♥ on ${r}♣`);
+    ok(beat(`${r}♠`, `${r}♦`), `${r}♠ on ${r}♦`);
+  }
+  no(beat('4♥', '5♠'), 'a lower rank still loses');
+  no(beat('5♥', '6♠'), '6 is not suitless');
+});
+test('Compare', 'suitless top card applies to pairs, straights and consecutive pairs', () => {
+  ok(beat('4♠ 4♣', '4♦ 4♥'), 'pair of 4s on pair of 4s');
+  ok(beat('3♠ 4♠ 5♠', '3♥ 4♥ 5♥'), 'straight ending in 5');
+  ok(beat('Q♠ K♠ A♠', 'Q♥ K♥ A♥'), 'straight ending in A');
+  no(beat('4♠ 5♠ 6♠', '4♥ 5♥ 6♥'), 'straight ending in 6 keeps suit order');
+  ok(beat('3♣ 3♦ 4♣ 4♦ 5♣ 5♦', '3♠ 3♥ 4♠ 4♥ 5♠ 5♥'), '33-44-55 on 33-44-55');
+});
+test('Compare', 'in a game: 4♣ may be played on 4♥, and the hint says "match or beat"', () => {
+  let g = game(['3♠ 9♥', '4♥ 9♠', '3♦ 4♣', '7♠ 8♠'], { leader: 1 });
+  g = applyPlay(g, 1, C('4♥'));
+  eq(validatePlay(g, 2, C('3♦')).reason, 'Must match or beat single 4♥');
+  ok(validatePlay(g, 2, C('4♣')).ok, '4♣ on 4♥ is allowed');
+  g = applyPlay(g, 2, C('4♣'));
+  eq(g.current.seat, 2);
 });
 test('Compare', 'pairs compare by their highest card', () => {
   ok(beat('7♠ 7♥', '7♣ 7♦'), '7♥ beats 7♦');

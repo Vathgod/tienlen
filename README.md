@@ -95,15 +95,16 @@ Then open <http://localhost:8000>. To try multiplayer alone, open the invite lin
 | | |
 |---|---|
 | **Hidden information** | You only see your own hand and the play currently on the table. Other players' card counts and the history of played cards are not shown or sent to anyone, so no card counting |
-| **Card order** | 3 4 5 6 7 8 9 10 J Q K A 2 · suits ♠ < ♣ < ♦ < ♥ (3♠ lowest, 2♥ highest) |
+| **Card order** | 3 4 5 6 7 8 9 10 J Q K A 2 · suits ♠ < ♣ < ♦ < ♥ for 6 to K and 2 (2♥ is the highest card) |
+| **House rule: A, 3, 4, 5** | for these ranks all four suits are equal, and the same rank may be played on top (4♣ on 4♥ and 4♥ on 4♣ are both allowed). This also applies to pairs, straights and consecutive pairs whose highest card is an A, 3, 4 or 5 |
 | **Combinations** | single · pair · triple (Sám) · four of a kind (Tứ quý) · straight of 3+ (Sảnh, no 2s, A only on top) · 3+ consecutive pairs (Đôi thông, no 2s) |
-| **Beating** | same type and number of cards, higher top card (rank, then suit) |
+| **Beating** | same type and number of cards, higher top card (rank, then suit), or an equal top card for A/3/4/5 |
 | **Chopping (Chặt)** | single 2 ← 3 consecutive pairs / four of a kind / 4 consecutive pairs · pair of 2s ← four of a kind / 4 consecutive pairs · 3 consecutive pairs ← higher 3 consecutive pairs / four of a kind / 4 consecutive pairs · four of a kind ← higher four / 4 consecutive pairs · 4 consecutive pairs ← higher 4 consecutive pairs |
 | **Turn order** | counter-clockwise (host can switch to clockwise) |
 | **First game** | the 3♠ holder leads and must include 3♠. Later games: the previous winner leads with anything |
 | **Passing** | locks you out until the round ends (host option: passed players may still chop) |
 | **Round end** | when everyone else passes, the last player who played leads. If they already finished, the next player in turn order leads |
-| **Timer** | 30 s by default (host can change or turn off). On timeout: auto-pass, or play the lowest card when leading. If the timer is off, a *disconnected* player is auto-played after 30 s so the game never gets stuck |
+| **Timer** | 30 s by default (host can pick 3, 5, 10, 15, 20, 30, 45 or 60 s, or turn it off). On timeout: auto-pass, or play the lowest card when leading. If the timer is off, a *disconnected* player is auto-played after 30 s so the game never gets stuck |
 | **Places** | 1st (Nhất), 2nd (Nhì), 3rd (Ba), last player is 4th (Bét). Points +3 / +1 / −1 / −3 by default (host can change) |
 | **Instant win (Tới trắng)** | checked after dealing (host can turn off): four 2s, dragon straight 3→A, 5 consecutive pairs, or 6 pairs (a four of a kind counts as 2 pairs). If two players qualify, the stronger hand wins in that order; ties go to the player closest to the 3♠ holder. The others are ranked in turn order after the winner |
 
