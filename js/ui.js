@@ -59,12 +59,6 @@ function cardHtml(card, { button = false, selected = false } = {}) {
 
 const cardsHtml = (cards) => sortByRank(cards).map((c) => cardHtml(c)).join('');
 
-/** Inline card chips for the log: 7♥ in red, 5♠ in black. */
-const chips = (cards) =>
-  sortByRank(cards)
-    .map((c) => `<span class="chip ${isRedCard(c) ? 'red' : ''}">${RANKS[rankOf(c)]}${textSuits(SUITS[suitOf(c)])}</span>`)
-    .join('');
-
 /** Overlap cards in a row so they always fit the container width. */
 function layoutRow(el) {
   const cards = el.children;
@@ -291,7 +285,6 @@ function renderGame(view) {
     : null;
   tickTimer();
 
-  renderLog(view);
   playEvents(view, events);
 }
 
@@ -302,11 +295,10 @@ function renderOpponent(el, view, seat) {
   const passed = g.passed[seat] && !!g.current && place < 0;
   el.className = `opp opp-${el.dataset.pos}${g.turn === seat && !g.over ? ' turn' : ''}${passed ? ' passed' : ''}${place >= 0 ? ' done' : ''}${s && !s.connected ? ' offline' : ''}`;
   const name = s ? s.name : '—';
-  const count = g.counts[seat];
-  const backs = Math.min(3, count);
+  // Card counts are secret: still-playing opponents just show a few card backs.
   const cards = place >= 0
     ? `<span class="badge place-${place}">${PLACE_SHORT[place]}</span>`
-    : `<span class="backs">${'<i></i>'.repeat(backs)}</span><b class="count">${count}</b>`;
+    : '<span class="backs"><i></i><i></i><i></i></span>';
   const tags = [
     s && !s.connected ? '<span class="tag off">Offline</span>' : '',
     passed ? '<span class="tag">Passed</span>' : '',
@@ -390,34 +382,6 @@ function tickTimer() {
       bar.classList.toggle('urgent', secs <= 5);
     }
   }
-}
-
-function formatEvent(view, e) {
-  const n = (seat) => `<b>${who(view, seat)}</b>`;
-  const timeout = e.auto ? ' <em>(time out)</em>' : '';
-  switch (e.type) {
-    case 'start':
-      return `Game ${view.gameNo} started — ${n(e.seat)} ${e.seat === view.mySeat ? 'go' : 'goes'} first${e.threeSpades ? ` (${chips([0])})` : ''}`;
-    case 'play':
-      return `${n(e.seat)} played ${chips(e.cards)}${e.chop ? ` — <b class="chop-word">CHẶT</b> ${n(e.victim)}!` : ''}${timeout}`;
-    case 'pass':
-      return `${n(e.seat)} passed${timeout}`;
-    case 'roundWon':
-      return `${n(e.seat)} won the round${e.leader !== e.seat && e.leader != null ? ` — ${n(e.leader)} ${e.leader === view.mySeat ? 'lead' : 'leads'}` : ''}`;
-    case 'finish':
-      return `${n(e.seat)} finished <b>${PLACE_NAMES[e.place]}</b>`;
-    case 'instantWin':
-      return `${n(e.seat)} won instantly (Tới trắng): ${esc(e.label)}`;
-    case 'gameOver':
-      return 'Game over';
-    default:
-      return '';
-  }
-}
-
-function renderLog(view) {
-  const items = view.game.log.slice(-40).reverse();
-  $('#log').innerHTML = items.map((e) => `<li class="ev-${e.type}">${formatEvent(view, e)}</li>`).join('');
 }
 
 function playEvents(view, events) {
@@ -610,8 +574,6 @@ export function init(handlers) {
     });
     refreshControls();
   });
-  $('#btn-log').addEventListener('click', () => $('#screen-game').classList.toggle('log-open'));
-  $('#btn-log-close').addEventListener('click', () => $('#screen-game').classList.remove('log-open'));
   $('#btn-leave-game').addEventListener('click', () => ui.h.onLeave());
   $('#btn-lobby').addEventListener('click', () => {
     const playing = ui.view && ui.view.phase === 'playing';

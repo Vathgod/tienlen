@@ -94,6 +94,7 @@ Then open <http://localhost:8000>. To try multiplayer alone, open the invite lin
 
 | | |
 |---|---|
+| **Hidden information** | You only see your own hand and the play currently on the table. Other players' card counts and the history of played cards are not shown or sent to anyone, so no card counting |
 | **Card order** | 3 4 5 6 7 8 9 10 J Q K A 2 · suits ♠ < ♣ < ♦ < ♥ (3♠ lowest, 2♥ highest) |
 | **Combinations** | single · pair · triple (Sám) · four of a kind (Tứ quý) · straight of 3+ (Sảnh, no 2s, A only on top) · 3+ consecutive pairs (Đôi thông, no 2s) |
 | **Beating** | same type and number of cards, higher top card (rank, then suit) |

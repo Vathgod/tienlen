@@ -306,7 +306,6 @@ input[type="checkbox"] { width: 22px; height: 22px; min-height: 0; accent-color:
   background: repeating-linear-gradient(45deg, #b3202a 0 3px, #8b141d 3px 6px);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
-.count { font-size: 18px; font-weight: 800; min-width: 1.4em; }
 .opp-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; font-size: 12px; }
 .opp-score { color: var(--muted); }
 .timer-bar { position: absolute; left: 10px; right: 10px; bottom: 3px; height: 3px; border-radius: 3px; overflow: hidden; }
@@ -431,17 +430,6 @@ button.card { cursor: pointer; }
   button.card:not(.selected):hover { transform: translateY(calc(var(--card-h) * -0.06)); }
 }
 
-.chip {
-  display: inline-block;
-  background: var(--card-face);
-  color: var(--card-black);
-  font: 700 12px/1.5 Georgia, serif;
-  padding: 0 4px;
-  border-radius: 4px;
-  margin: 0 1px;
-}
-.chip.red { color: var(--card-red); }
-
 /* ───────────────────────── Chop effect ───────────────────────── */
 .chop-fx {
   position: absolute;
@@ -462,45 +450,8 @@ button.card { cursor: pointer; }
   letter-spacing: 0.02em;
 }
 #chop-sub { font-weight: 800; font-size: 18px; text-shadow: 0 2px 6px #000; margin-top: 6px; }
-.chop-word { color: #ff6b6b; }
-
-/* ───────────────────────── Log ───────────────────────── */
-.log-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: min(320px, 86vw);
-  z-index: 20;
-  display: flex;
-  flex-direction: column;
-  background: var(--panel-solid);
-  border-left: 1px solid var(--line);
-  padding: max(10px, env(safe-area-inset-top)) 12px 10px;
-  transform: translateX(105%);
-  transition: transform 0.2s ease;
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
-}
-.log-open .log-panel { transform: none; }
-.log-head { display: flex; align-items: center; justify-content: space-between; }
-.log-head h3 { margin: 0; }
-.log { list-style: none; margin: 8px 0 0; padding: 0; overflow-y: auto; font-size: 13px; }
-.log li { padding: 6px 2px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
-.log li:first-child { color: var(--ink); }
-.log li.ev-roundWon, .log li.ev-start { color: var(--muted); font-style: italic; }
-.log li.ev-finish, .log li.ev-instantWin { color: var(--gold); }
-.log em { color: var(--muted); }
 
 @media (min-width: 1000px) {
-  #screen-game.active { grid-template-columns: minmax(0, 1fr) 300px; }
-  .log-panel {
-    position: static;
-    width: auto;
-    transform: none;
-    box-shadow: none;
-    background: rgba(0, 0, 0, 0.28);
-  }
-  .log-toggle, #btn-log-close { display: none; }
   .table { grid-template-columns: minmax(130px, 1fr) minmax(0, 3fr) minmax(130px, 1fr); }
 }
 
@@ -592,7 +543,6 @@ button.card { cursor: pointer; }
   .opp { padding: 6px 6px 8px; }
   .opp-top { padding: 4px 10px 8px; }
   .opp-left .avatar, .opp-right .avatar { width: 28px; height: 28px; font-size: 13px; }
-  .count { font-size: 16px; }
   .opp-left .opp-name, .opp-right .opp-name { max-width: 64px; font-size: 12px; }
   .controls .btn.small { padding: 0 8px; }
   #btn-play, #btn-pass { min-width: 72px; padding: 0 12px; }

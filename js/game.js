@@ -222,6 +222,7 @@ function nextInPlay(state, seat) {
 }
 
 const MAX_LOG = 60;
+const VIEW_LOG = 12; // recent events sent to players (only used for animations)
 
 function pushEvent(state, event) {
   state.eventId += 1;
@@ -411,9 +412,11 @@ export function scoreDeltas(finished, points) {
 }
 
 /**
- * What `seat` is allowed to see: their own hand and everyone's card counts.
- * Other hands are null — except at the end, when the last player's leftover
- * cards (and an instant winner's hand) are revealed.
+ * What `seat` is allowed to see: their own hand and the play on the table.
+ * Other players' hands AND card counts are hidden (null) until the game ends,
+ * when the last player's leftover cards (and an instant winner's hand) are
+ * revealed. The event log keeps who did what, but not which cards were
+ * played, so nobody can count cards from it.
  */
 export function viewFor(state, seat) {
   const revealed = new Set();
@@ -432,8 +435,8 @@ export function viewFor(state, seat) {
     over: state.over,
     instantWin: clone(state.instantWin),
     eventId: state.eventId,
-    log: clone(state.log),
-    counts: state.hands.map((h) => h.length),
+    log: state.log.slice(-VIEW_LOG).map(({ cards, ...event }) => ({ ...event })),
+    counts: state.hands.map((h, i) => (i === seat || state.over ? h.length : null)),
     hands: state.hands.map((h, i) => (i === seat || revealed.has(i) ? [...h] : null)),
   };
 }

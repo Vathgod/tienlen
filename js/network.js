@@ -28,8 +28,9 @@
  *   { t: 'view', view }            Full snapshot of the room for THIS guest
  *                                  (built by buildView in main.js): seats, settings,
  *                                  scores, phase, and during a game game.viewFor()
- *                                  — only this guest's own hand plus everyone's
- *                                  card counts. Sent after every change.
+ *                                  — only this guest's own hand and the play on
+ *                                  the table. Other players' hands, card counts and
+ *                                  past plays are never sent. Sent after every change.
  *   { t: 'error', message }        Your last action was rejected ("Must beat …").
  *   { t: 'kicked' }                The host removed you from the lobby.
  *   { t: 'host-left' }             The host closed the room; the game is over.

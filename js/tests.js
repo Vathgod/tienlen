@@ -310,11 +310,20 @@ test('Misc', 'shuffle keeps every card', () => {
   const s = shuffle(Array.from({ length: 52 }, (_, i) => i));
   eq([...s].sort((a, b) => a - b), Array.from({ length: 52 }, (_, i) => i));
 });
-test('Misc', 'viewFor hides other players\' hands', () => {
+test('Misc', 'viewFor hides other players\' hands and card counts', () => {
   const g = game(['3♠ 9♥', '4♠ 9♠', '5♠ 6♠', '7♠ 8♠']);
   const v = viewFor(g, 2);
   eq(v.hands, [null, null, C('5♠ 6♠'), null]);
-  eq(v.counts, [2, 2, 2, 2]);
+  eq(v.counts, [null, null, 2, null]);
+});
+test('Misc', 'viewFor log does not reveal played cards', () => {
+  let g = game(['3♠ 9♥', '4♠ 9♠', '5♠ 6♠', '7♠ 8♠']);
+  g = applyPlay(g, 0, C('3♠'));
+  const v = viewFor(g, 1);
+  const play = v.log.find((e) => e.type === 'play');
+  ok(play && play.seat === 0, 'play event kept');
+  no('cards' in play, 'but without its cards');
+  eq(v.current.combo.cards, C('3♠'), 'the play on the table is still visible');
 });
 test('Misc', 'timeout: auto-pass when possible, otherwise lowest single', () => {
   let g = game(['3♠ 9♥', '4♠ 9♠', '5♠ 6♠', '7♠ 8♠']);
