@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b3d24">
+  <meta name="description" content="Play Tiến Lên (Vietnamese Thirteen) online with 3 friends — no install, no account.">
+  <title>Tiến Lên Online</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='10' y='4' width='44' height='56' rx='6' fill='%23fffdf7' stroke='%230b3d24' stroke-width='3'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle' fill='%23c8102e'%3E%E2%99%A5%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <!-- PeerJS: WebRTC peer-to-peer connections (uses the free public PeerJS server to connect players). -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+
+  <!-- ═════════ Home ═════════ -->
+  <section id="screen-home" class="screen screen-center active">
+    <div class="panel home-panel">
+      <div class="logo-fan" aria-hidden="true">
+        <span class="lf lf1">2<i>♠&#xFE0E;</i></span>
+        <span class="lf lf2 red">2<i>♥&#xFE0E;</i></span>
+        <span class="lf lf3 red">2<i>♦&#xFE0E;</i></span>
+      </div>
+      <h1>Tiến Lên</h1>
+      <p class="subtitle">Vietnamese “Thirteen” · 4 players · Southern rules (Miền Nam)</p>
+      <div class="stack">
+        <button id="btn-create" type="button" class="btn primary big">Create Room</button>
+        <button id="btn-join" type="button" class="btn big">Join Room</button>
+      </div>
+      <details class="rules">
+        <summary>Quick rules</summary>
+        <ul>
+          <li>Get rid of all 13 cards first. Ranks low → high: 3 4 5 6 7 8 9 10 J Q K A 2. Suits: ♠&#xFE0E; &lt; ♣&#xFE0E; &lt; ♦&#xFE0E; &lt; ♥&#xFE0E;.</li>
+          <li>Play a single, pair, triple, four of a kind (Tứ quý), straight of 3+ (Sảnh, no 2s) or 3+ consecutive pairs (Đôi thông).</li>
+          <li>Beat the play on the table with the same type and number of cards, but higher — or pass (Bỏ lượt) until the round ends.</li>
+          <li>Chop (Chặt) 2s with bombs: 3 consecutive pairs beat a single 2; four of a kind or 4 consecutive pairs beat a single 2 or a pair of 2s.</li>
+          <li>First game: whoever holds 3♠&#xFE0E; starts and must play it. After that, the previous winner starts.</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <!-- ═════════ Name / join ═════════ -->
+  <section id="screen-name" class="screen screen-center">
+    <form id="name-form" class="panel form-panel" autocomplete="off">
+      <h2 id="name-title">Create a room</h2>
+      <p id="name-sub" class="muted"></p>
+      <label class="field">
+        <span>Your name</span>
+        <input id="input-name" name="name" maxlength="16" required autocomplete="nickname" placeholder="e.g. Lan" enterkeyhint="go">
+      </label>
+      <label id="code-field" class="field" hidden>
+        <span>Room code</span>
+        <input id="input-code" name="code" maxlength="6" autocapitalize="characters" spellcheck="false" placeholder="ABC123" class="code-input">
+      </label>
+      <p class="tip">📱 On a phone? Open the invite link in <b>Chrome</b> or <b>Safari</b>, not inside Zalo, Messenger or Facebook.</p>
+      <p id="name-error" class="error" role="alert"></p>
+      <div class="row">
+        <button id="btn-name-back" type="button" class="btn">Back</button>
+        <button id="btn-name-go" type="submit" class="btn primary grow">Create Room</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ═════════ Lobby ═════════ -->
+  <section id="screen-lobby" class="screen screen-center">
+    <div class="panel lobby-panel">
+      <div class="lobby-head">
+        <h2>Room <span id="lobby-code" class="code"></span></h2>
+        <button id="btn-leave-lobby" type="button" class="btn small">Leave</button>
+      </div>
+
+      <div class="invite">
+        <label for="invite-link" class="muted">Invite link</label>
+        <div class="invite-row">
+          <input id="invite-link" readonly>
+          <button id="btn-copy" type="button" class="btn primary small">Copy invite link</button>
+          <button id="btn-share" type="button" class="btn small" hidden>Share</button>
+        </div>
+      </div>
+
+      <h3>Players</h3>
+      <ol id="lobby-seats" class="seats"></ol>
+      <p id="lobby-status" class="muted status"></p>
+      <button id="btn-start" type="button" class="btn primary big" hidden>Start Game</button>
+
+      <form id="settings" class="settings">
+        <h3>Settings <span class="muted small-text">(host only)</span></h3>
+        <label class="set-row">
+          <span>Turn timer</span>
+          <select name="turnSeconds">
+            <option value="0">Off</option>
+            <option value="15">15 seconds</option>
+            <option value="20">20 seconds</option>
+            <option value="30">30 seconds</option>
+            <option value="45">45 seconds</option>
+            <option value="60">60 seconds</option>
+          </select>
+        </label>
+        <label class="set-row">
+          <span>Turn order</span>
+          <select name="direction">
+            <option value="ccw">Counter-clockwise</option>
+            <option value="cw">Clockwise</option>
+          </select>
+        </label>
+        <label class="set-row check">
+          <span>Instant win (Tới trắng)</span>
+          <input type="checkbox" name="instantWin">
+        </label>
+        <label class="set-row check">
+          <span>Allow chopping after passing (Chặt sau khi bỏ lượt)</span>
+          <input type="checkbox" name="chopAfterPass">
+        </label>
+        <div class="set-row points">
+          <span>Points</span>
+          <div class="points-grid">
+            <label>1st <input type="number" name="p0" min="-99" max="99" inputmode="numeric"></label>
+            <label>2nd <input type="number" name="p1" min="-99" max="99" inputmode="numeric"></label>
+            <label>3rd <input type="number" name="p2" min="-99" max="99" inputmode="numeric"></label>
+            <label>4th <input type="number" name="p3" min="-99" max="99" inputmode="numeric"></label>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ═════════ Game ═════════ -->
+  <section id="screen-game" class="screen">
+    <div id="table" class="table">
+      <header class="topbar">
+        <span class="room-tag">Room <b id="game-code"></b></span>
+        <div class="topbar-actions">
+          <button id="btn-results" type="button" class="btn small" hidden>Results</button>
+          <button id="btn-log" type="button" class="btn small log-toggle">Log</button>
+          <button id="btn-lobby" type="button" class="btn small" hidden>Lobby</button>
+          <button id="btn-leave-game" type="button" class="btn small">Leave</button>
+        </div>
+      </header>
+
+      <div id="opp-top" class="opp opp-top" data-pos="top"></div>
+      <div id="opp-left" class="opp opp-left" data-pos="left"></div>
+      <div id="center" class="center"></div>
+      <div id="opp-right" class="opp opp-right" data-pos="right"></div>
+
+      <div id="me" class="me">
+        <div class="me-bar">
+          <span class="me-who">
+            <b id="me-name"></b>
+            <span id="me-score" class="muted"></span>
+            <span id="me-place" class="badge" hidden></span>
+          </span>
+          <span id="me-timer" class="me-timer" hidden></span>
+        </div>
+        <div id="hint" class="hint" aria-live="polite"></div>
+        <div class="controls">
+          <button id="btn-sort" type="button" class="btn small" title="Sort by rank or by suit">Sort: rank</button>
+          <button id="btn-clear" type="button" class="btn small" title="Deselect all cards">Clear</button>
+          <span class="spacer"></span>
+          <button id="btn-pass" type="button" class="btn">Pass</button>
+          <button id="btn-play" type="button" class="btn primary">Play</button>
+        </div>
+        <div id="hand" class="cards-row hand" aria-label="Your hand"></div>
+      </div>
+
+      <div id="chop-fx" class="chop-fx" aria-live="assertive">
+        <span class="chop-big">CHẶT!</span>
+        <span id="chop-sub"></span>
+      </div>
+    </div>
+
+    <aside id="log-panel" class="log-panel">
+      <div class="log-head">
+        <h3>Moves</h3>
+        <button id="btn-log-close" type="button" class="icon-btn" aria-label="Close log">✕</button>
+      </div>
+      <ol id="log" class="log"></ol>
+    </aside>
+  </section>
+
+  <!-- ═════════ End of game ═════════ -->
+  <div id="end-overlay" class="overlay" hidden>
+    <div class="panel end-panel" role="dialog" aria-labelledby="end-title">
+      <h2 id="end-title">Game over</h2>
+      <p id="end-instant" class="instant" hidden></p>
+      <ol id="end-ranking" class="ranking"></ol>
+      <div id="end-reveal"></div>
+      <div id="end-host" class="end-actions">
+        <button id="btn-next" type="button" class="btn primary big">Next Game</button>
+        <div class="row">
+          <button id="btn-reset" type="button" class="btn grow">Reset Scores</button>
+          <button id="btn-to-lobby" type="button" class="btn grow">Back to lobby</button>
+        </div>
+      </div>
+      <p id="end-guest" class="muted center-text">Waiting for the host to start the next game…</p>
+      <button id="end-hide" type="button" class="link-btn">View table</button>
+    </div>
+  </div>
+
+  <!-- ═════════ Messages (errors, reconnecting) ═════════ -->
+  <div id="msg-overlay" class="overlay" hidden>
+    <div class="panel msg-panel" role="alertdialog" aria-labelledby="msg-title">
+      <div id="msg-spinner" class="spinner" hidden></div>
+      <h2 id="msg-title"></h2>
+      <p id="msg-text"></p>
+      <div id="msg-buttons" class="row"></div>
+    </div>
+  </div>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+</body>
+</html>

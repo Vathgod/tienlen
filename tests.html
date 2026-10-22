@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tiến Lên Tests</title>
+  <style>
+    :root { --bg: #f6f7f5; --ink: #1c1f1d; --muted: #66706a; --pass: #1b7f45; --fail: #c62828; --line: #dde2de; }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) { --bg: #101412; --ink: #e8ece9; --muted: #9aa59f; --pass: #57d18a; --fail: #ff6b6b; --line: #2a312d; }
+    }
+    :root[data-theme="dark"] { --bg: #101412; --ink: #e8ece9; --muted: #9aa59f; --pass: #57d18a; --fail: #ff6b6b; --line: #2a312d; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, sans-serif; }
+    main { max-width: 760px; margin: 0 auto; padding: 24px 16px; }
+    h1 { margin: 0 0 4px; font-size: 24px; }
+    #summary { font-weight: 700; margin: 12px 0 20px; font-size: 18px; }
+    #summary.ok { color: var(--pass); }
+    #summary.bad { color: var(--fail); }
+    h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 22px 0 6px; }
+    ul { list-style: none; margin: 0; padding: 0; }
+    li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+    .mark { display: inline-block; width: 3.2em; font-weight: 800; }
+    .pass .mark { color: var(--pass); }
+    .fail .mark { color: var(--fail); }
+    .err { display: block; margin-left: 3.2em; color: var(--fail); font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+    a { color: inherit; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Tiến Lên — rules tests</h1>
+    <p>Unit tests for <code>js/game.js</code>. <a href="./">← Back to the game</a></p>
+    <div id="summary">Running…</div>
+    <div id="results"></div>
+  </main>
+  <script type="module">
+    import { runTests } from './js/tests.js';
+
+    const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+    const results = runTests();
+    const groups = [...new Set(results.map((r) => r.group))];
+    document.getElementById('results').innerHTML = groups.map((g) => `
+      <h2>${esc(g)}</h2>
+      <ul>${results.filter((r) => r.group === g).map((r) => `
+        <li class="${r.pass ? 'pass' : 'fail'}"><span class="mark">${r.pass ? 'PASS' : 'FAIL'}</span>${esc(r.name)}
+        ${r.pass ? '' : `<span class="err">${esc(r.error)}</span>`}</li>`).join('')}
+      </ul>`).join('');
+    const failed = results.filter((r) => !r.pass).length;
+    const summary = document.getElementById('summary');
+    summary.textContent = failed ? `${failed} of ${results.length} tests FAILED` : `All ${results.length} tests passed ✓`;
+    summary.className = failed ? 'bad' : 'ok';
+    document.title = `${failed ? '✗' : '✓'} Tiến Lên Tests`;
+  </script>
+</body>
+</html>
